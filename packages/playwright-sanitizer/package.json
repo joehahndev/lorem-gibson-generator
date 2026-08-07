@@ -1,0 +1,27 @@
+{
+  "name": "@lorem-gibson/playwright-sanitizer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Replace real DOM text with Lorem Gibson placeholder text before a Playwright screenshot, for anonymizing UI screenshots that end up in docs/tickets/blog posts.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@lorem-gibson/dictionary": "*"
+  },
+  "peerDependencies": {
+    "playwright": ">=1.30.0",
+    "playwright-core": ">=1.30.0"
+  },
+  "peerDependenciesMeta": {
+    "playwright": {
+      "optional": true
+    },
+    "playwright-core": {
+      "optional": true
+    }
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "@lorem-gibson/generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cyberpunk placeholder text on demand — CLI and library, generated from the shared Lorem Gibson dictionary.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "lorem-gibson": "./bin/lorem-gibson.js"
+  },
+  "dependencies": {
+    "@lorem-gibson/dictionary": "*"
+  },
+  "license": "MIT"
+}

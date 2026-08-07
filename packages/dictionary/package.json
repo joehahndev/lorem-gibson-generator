@@ -1,0 +1,16 @@
+{
+  "name": "@lorem-gibson/dictionary",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Merged, deduped word data for Lorem Gibson placeholder text — shared by every tool in this repo.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "data",
+    "index.js"
+  ],
+  "license": "MIT"
+}

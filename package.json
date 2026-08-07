@@ -1,0 +1,11 @@
+{
+  "name": "lorem-gibson-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cyberpunk (William Gibson-style) placeholder text tools: a shared word dictionary, a text generator/CLI, and a Playwright screenshot sanitizer — bound together by the dictionary they all draw from.",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "license": "MIT"
+}
