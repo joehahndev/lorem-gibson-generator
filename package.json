@@ -7,5 +7,11 @@
   "workspaces": [
     "packages/*"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "author": "Joe Hahn",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joehahndev/lorem-gibson-generator"
+  },
+  "homepage": "https://github.com/joehahndev/lorem-gibson-generator#readme"
 }
