@@ -1,0 +1,19 @@
+{
+  "name": "@lorem-gibson/mcp-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local MCP server exposing Lorem Gibson text generation and Playwright screenshot sanitization as tools, machine-wide.",
+  "type": "module",
+  "bin": {
+    "lorem-gibson-mcp": "./bin/server.js"
+  },
+  "dependencies": {
+    "@lorem-gibson/dictionary": "*",
+    "@lorem-gibson/generator": "*",
+    "@lorem-gibson/playwright-sanitizer": "*",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "playwright": "^1.62.1",
+    "zod": "^4.4.3"
+  },
+  "license": "MIT"
+}

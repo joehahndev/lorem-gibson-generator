@@ -1,13 +1,15 @@
 # lorem-gibson-generator
 
-Cyberpunk (William Gibson-style) placeholder text, three tools, one repo
-— bound together by the word dictionary all three draw from.
+Cyberpunk (William Gibson-style) placeholder text, four tools, one repo
+— bound together by the word dictionary they draw from and the
+anonymize-a-screenshot purpose most of them serve.
 
 | Package | What it's for |
 |---|---|
 | [`packages/dictionary`](packages/dictionary) | The word data. Merged and deduped from three GitHub "Lorem Gibson" clones. See [`SOURCES.md`](SOURCES.md) for provenance. |
 | [`packages/generator`](packages/generator) | `npx lorem-gibson` CLI + library — words, sentences, paragraphs, titles, slugs, on demand. |
-| [`packages/playwright-sanitizer`](packages/playwright-sanitizer) | Replaces real text in a page's DOM with placeholder text before a Playwright screenshot, so screenshots that end up in docs/tickets/blog posts don't leak real data. |
+| [`packages/playwright-sanitizer`](packages/playwright-sanitizer) | Replaces real text (and optionally images, as CRT dead-channel static) in a page's DOM before a Playwright screenshot, so screenshots that end up in docs/tickets/blog posts don't leak real data. |
+| [`packages/mcp-server`](packages/mcp-server) | The above two, as an MCP server registered machine-wide — `generate_text`, `screenshot_sanitized`, `sanitize_html` tools available to any project's Claude Code session, no per-project install. |
 
 ## Setup
 
