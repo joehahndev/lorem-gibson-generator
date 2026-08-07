@@ -14,6 +14,7 @@
  *   preserveNumbers: boolean,
  *   maskEmailsAndUrls: boolean,
  *   watch: boolean,
+ *   images: false|{ style: string, minDimension: number, maxDimension: number },
  * }} payload
  */
 export function browserSanitize(payload) {
@@ -23,6 +24,7 @@ export function browserSanitize(payload) {
   var attributes = payload.attributes;
   var preserveNumbers = payload.preserveNumbers;
   var maskEmailsAndUrls = payload.maskEmailsAndUrls;
+  var images = payload.images;
 
   // ---- deterministic RNG (mulberry32 + FNV-1a), same algorithm as
   // @lorem-gibson/generator's rng.js, duplicated here because this
@@ -144,6 +146,127 @@ export function browserSanitize(payload) {
     return parts.join('');
   }
 
+  // ---- CRT dead-channel image replacement ----
+  // "The sky above the port was the color of television, tuned to a
+  // dead channel." Draws directly into a <canvas>, screen content only
+  // — no bezel/frame chrome — then swaps it in as the <img> src via a
+  // data URL. Self-contained (no external image assets) so it works
+  // offline and inside the sandboxed page context.
+  var CRT_STYLES = ['snow', 'scanlines', 'scrambled', 'phosphor'];
+
+  function drawSnow(ctx, w, h, rng) {
+    // Classic black & white salt-and-pepper static.
+    var imageData = ctx.createImageData(w, h);
+    var data = imageData.data;
+    for (var i = 0; i < data.length; i += 4) {
+      var v = Math.floor(rng() * 256);
+      data[i] = v;
+      data[i + 1] = v;
+      data[i + 2] = v;
+      data[i + 3] = 255;
+    }
+    ctx.putImageData(imageData, 0, 0);
+  }
+
+  function drawScanlines(ctx, w, h, rng) {
+    // Idle CRT glow: no signal, tube still lit — dim gradient plus a
+    // faint sprinkle of noise and even horizontal scanlines.
+    var grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.75);
+    grad.addColorStop(0, '#202a3d');
+    grad.addColorStop(1, '#05070c');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    for (var y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+    for (var i = 0; i < (w * h) / 40; i++) {
+      ctx.fillRect(rng() * w, rng() * h, 1, 1);
+    }
+  }
+
+  function drawScrambled(ctx, w, h, rng) {
+    // Tracking-error scramble: dark base, shifted/jittered horizontal
+    // bands, a couple of bright glitch lines.
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, w, h);
+    var bandCount = 6 + Math.floor(rng() * 8);
+    for (var b = 0; b < bandCount; b++) {
+      var by = rng() * h;
+      var bh = 2 + rng() * (h / 12);
+      var xShift = (rng() - 0.5) * w * 0.2;
+      ctx.fillStyle =
+        'rgba(' +
+        Math.floor(rng() * 90) +
+        ', ' +
+        Math.floor(rng() * 90) +
+        ', ' +
+        Math.floor(80 + rng() * 120) +
+        ', ' +
+        (0.4 + rng() * 0.4) +
+        ')';
+      ctx.fillRect(xShift, by, w, bh);
+    }
+    for (var g = 0; g < 3; g++) {
+      ctx.fillStyle = 'rgba(255, 255, 255, ' + (0.15 + rng() * 0.25) + ')';
+      ctx.fillRect(0, rng() * h, w, 1);
+    }
+  }
+
+  function drawPhosphor(ctx, w, h, rng) {
+    // Monochrome green phosphor noise with faint burn-in ghosting.
+    var imageData = ctx.createImageData(w, h);
+    var data = imageData.data;
+    for (var i = 0; i < data.length; i += 4) {
+      var v = Math.floor(rng() * 55);
+      data[i] = 0;
+      data[i + 1] = v + 15;
+      data[i + 2] = 0;
+      data[i + 3] = 255;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    for (var g = 0; g < 3; g++) {
+      ctx.fillStyle = 'rgba(60, 255, 120, 0.05)';
+      ctx.fillRect(rng() * w * 0.6, rng() * h * 0.6, w * (0.2 + rng() * 0.3), h * (0.2 + rng() * 0.3));
+    }
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    for (var y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+  }
+
+  var DRAW_BY_STYLE = { snow: drawSnow, scanlines: drawScanlines, scrambled: drawScrambled, phosphor: drawPhosphor };
+
+  function crtDataUrl(style, width, height, rng) {
+    var w = Math.max(1, Math.min(Math.round(width) || images.minDimension, images.maxDimension));
+    var h = Math.max(1, Math.min(Math.round(height) || images.minDimension, images.maxDimension));
+    var canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    var chosenStyle = style === 'random' ? CRT_STYLES[Math.floor(rng() * CRT_STYLES.length)] : style;
+    (DRAW_BY_STYLE[chosenStyle] || drawSnow)(ctx, w, h, rng);
+    return canvas.toDataURL('image/png');
+  }
+
+  function sanitizeImages(root) {
+    var imgs = root.querySelectorAll ? root.querySelectorAll('img') : [];
+    if (root.tagName === 'IMG') imgs = [root].concat(Array.prototype.slice.call(imgs));
+    for (var i = 0; i < imgs.length; i++) {
+      var img = imgs[i];
+      if (isExcluded(img) || !isIncluded(img)) continue;
+      var rect = img.getBoundingClientRect();
+      var width = rect.width || img.naturalWidth || img.width;
+      var height = rect.height || img.naturalHeight || img.height;
+      if (width < images.minDimension || height < images.minDimension) continue; // likely an icon/logo, leave it
+      // Lock in the rendered box before swapping src, so an image sized
+      // by its own intrinsic dimensions (no explicit CSS width/height)
+      // doesn't reflow once the replacement's natural size differs.
+      if (!img.style.width) img.style.width = rect.width + 'px';
+      if (!img.style.height) img.style.height = rect.height + 'px';
+      var rng = mulberry32(hashSeed(baseSeed + '|image-' + nodeCounter++));
+      img.src = crtDataUrl(images.style, width, height, rng);
+      img.removeAttribute('srcset');
+    }
+  }
+
   function isExcluded(el) {
     if (!el) return false;
     var tag = el.tagName ? el.tagName.toLowerCase() : '';
@@ -202,6 +325,8 @@ export function browserSanitize(payload) {
       if (['checkbox', 'radio', 'button', 'submit', 'hidden', 'file', 'password'].indexOf(type) !== -1) continue;
       if (field.value) field.value = replaceText(field.value, 'value-' + nodeCounter++);
     }
+
+    if (images) sanitizeImages(root);
   }
 
   sanitizeRoot(document.body || document);

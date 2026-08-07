@@ -49,8 +49,35 @@ await sanitizePage(page, {
   preserveNumbers: true,         // "42" -> "17", not a word
   maskEmailsAndUrls: true,       // real-looking emails/URLs -> obvious fakes
   watch: true,                   // keep sanitizing content added after the initial pass (SPA route changes)
+  images: true,                  // also replace <img> content — see "Images" below
 })
 ```
+
+### Images
+
+> "The sky above the port was the color of television, tuned to a dead channel."
+
+`images` is `false` by default — text has a safe universal replacement
+(any dictionary word reads fine in any UI copy slot), but images don't:
+there's no reliable signal telling a user's uploaded photo apart from a
+decorative logo or icon, so this stays opt-in rather than nuking every
+`<img>` on the page.
+
+Turn it on and every `<img>` at least `imageMinDimension` (default 32px)
+in both directions gets its content replaced with a canvas-drawn CRT
+dead-channel texture — screen content only, no bezel/frame chrome — sized
+to the image's existing rendered box so layout doesn't shift:
+
+```js
+await sanitizePage(page, { images: true })                       // random style per image
+await sanitizePage(page, { images: { style: 'scrambled' } })     // pick one
+await sanitizePage(page, { imageMinDimension: 64 })               // spare more small icons
+```
+
+Styles: `'snow'` (black & white static), `'scanlines'` (dim idle-tube
+glow), `'scrambled'` (tracking-error bands and glitch lines), `'phosphor'`
+(monochrome green noise), or `'random'` (default when `images: true` —
+picks deterministically per image from the seed).
 
 Always sanitizes the whole page except script/style/noscript/template/svg
 by default — the assumption is "everything is potentially real user data

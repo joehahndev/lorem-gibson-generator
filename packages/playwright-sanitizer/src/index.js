@@ -18,11 +18,34 @@ const DEFAULT_OPTIONS = {
   maskEmailsAndUrls: true,
   /** Keep sanitizing content added to the DOM after the initial pass (SPA route changes, lazy content) via a MutationObserver. Call stopWatching(page) when done. */
   watch: false,
+  /**
+   * Replace <img> content with a CRT dead-channel look — snow/static,
+   * scanlines, tracking-scramble, or phosphor noise. `false` (default)
+   * leaves images alone; `true` sanitizes every image at least
+   * `imageMinDimension` in either direction with a randomly-chosen
+   * style; or pass an object to pick a specific `style`
+   * ('snow' | 'scanlines' | 'scrambled' | 'phosphor' | 'random').
+   * Off by default because, unlike text, there's no safe universal
+   * signal to tell a user's uploaded photo apart from a decorative
+   * logo or icon — turn it on deliberately.
+   */
+  images: false,
+  /** Images smaller than this (px, either dimension) are left alone even when `images` is on — catches icons/logos. */
+  imageMinDimension: 32,
+  /** Placeholder image texture resolution cap (px) — kept small on purpose, it's static, not a photo. */
+  imageMaxDimension: 320,
 };
 
 function buildPayload(options) {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const words = opts.includeProperNouns ? [...general, ...properNouns] : general;
+  const imagesOpt = opts.images
+    ? {
+        style: (opts.images === true ? undefined : opts.images.style) ?? 'random',
+        minDimension: opts.imageMinDimension,
+        maxDimension: opts.imageMaxDimension,
+      }
+    : false;
   return {
     words,
     seed: opts.seed,
@@ -32,6 +55,7 @@ function buildPayload(options) {
     preserveNumbers: opts.preserveNumbers,
     maskEmailsAndUrls: opts.maskEmailsAndUrls,
     watch: opts.watch,
+    images: imagesOpt,
   };
 }
 
@@ -39,7 +63,9 @@ function buildPayload(options) {
  * Walks the page's DOM and replaces visible text — plus alt/title/
  * aria-label/placeholder attributes and input/textarea values — with
  * Lorem Gibson placeholder text, roughly preserving word length and
- * layout so a screenshot taken right after still looks "real."
+ * layout so a screenshot taken right after still looks "real." Pass
+ * `images: true` to also swap <img> content for CRT dead-channel static
+ * (off by default — see the `images` option below).
  *
  * Call this immediately before `page.screenshot()`. It mutates the live
  * page, not a copy — don't run it on a page you still need real content
