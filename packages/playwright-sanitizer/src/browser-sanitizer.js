@@ -106,6 +106,18 @@ export function browserSanitize(payload) {
       return 'https://example.test/' + pickWordNear(rng, 6).toLowerCase();
     }
 
+    // Any digit anywhere in the token gets swapped in place ("$1,204.55"
+    // -> "$8,617.29", "2026-07-14" -> "4193-58-27", "#48213" -> "#70945"),
+    // regardless of surrounding/embedded punctuation. Handled before the
+    // word-shaped path below because that path only understands
+    // punctuation at the very start/end of a token — a decimal or
+    // thousands-separator in the middle would otherwise make the whole
+    // token fail to match and pass through untouched, which is exactly
+    // the class of thing (money, dates, IDs) this tool exists to catch.
+    if (preserveNumbers && /[0-9]/.test(token)) {
+      return digitsLike(token, rng);
+    }
+
     // Split off leading/trailing punctuation so ".", "),", "€" etc. survive.
     var m = token.match(/^([^A-Za-z0-9]*)([A-Za-z0-9][A-Za-z0-9'-]*)([^A-Za-z0-9]*)$/);
     if (!m) return token; // pure punctuation/symbol token — leave as-is
@@ -113,10 +125,6 @@ export function browserSanitize(payload) {
     var lead = m[1],
       core = m[2],
       trail = m[3];
-
-    if (preserveNumbers && /^[0-9]+$/.test(core)) {
-      return lead + digitsLike(core, rng) + trail;
-    }
 
     var replacement = pickWordNear(rng, core.length);
     // A multi-word dictionary entry ("beef noodles") inside a single
