@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="240" viewBox="0 0 480 240">
+  <rect width="480" height="240" fill="#0f1420"/>
+  <text x="16" y="26" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#e8ecf5">Monthly active users — Northwind account</text>
+  <g fill="#5b9dd9">
+    <rect x="30"  y="150" width="34" height="60"/>
+    <rect x="80"  y="120" width="34" height="90"/>
+    <rect x="130" y="90"  width="34" height="120"/>
+    <rect x="180" y="70"  width="34" height="140"/>
+    <rect x="230" y="100" width="34" height="110"/>
+    <rect x="280" y="60"  width="34" height="150"/>
+    <rect x="330" y="40"  width="34" height="170"/>
+    <rect x="380" y="80"  width="34" height="130"/>
+  </g>
+  <line x1="20" y1="210" x2="440" y2="210" stroke="#3a4256" stroke-width="1"/>
+</svg>

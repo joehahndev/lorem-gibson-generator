@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Northwind — Customer Dashboard</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px; min-height: 100vh;
+    background: #0b0e14; color: #e8ecf5;
+    font: 15px/1.5 "Segoe UI", Arial, sans-serif;
+  }
+  .shell { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  header { display: flex; align-items: center; gap: 16px; }
+  header img { border-radius: 50%; }
+  header .who h1 { margin: 0; font-size: 20px; }
+  header .who .email { color: #8b93a7; font-size: 13px; }
+  .brand { margin-left: auto; font-weight: 600; color: #5b9dd9; letter-spacing: 0.04em; }
+  .card {
+    background: #131826; border: 1px solid #232b40; border-radius: 10px; padding: 20px;
+  }
+  .card h2 { margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: #8b93a7; }
+  .stats { display: flex; gap: 24px; }
+  .stat { flex: 1; }
+  .stat .value { font-size: 22px; font-weight: 700; }
+  .stat .label { color: #8b93a7; font-size: 12px; }
+  .chart img { width: 100%; height: auto; border-radius: 6px; display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #232b40; }
+  th { color: #8b93a7; font-weight: 600; }
+  input[type="search"] {
+    width: 100%; padding: 8px 10px; margin-bottom: 12px;
+    background: #0b0e14; border: 1px solid #232b40; border-radius: 6px; color: #e8ecf5;
+  }
+  .bio { color: #c3c9d9; }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <img src="assets/avatar.svg" width="56" height="56" alt="Photo of Jamie Torres">
+      <div class="who">
+        <h1>Jamie Torres</h1>
+        <div class="email">jamie.torres@northwind-retail.example</div>
+      </div>
+      <div class="brand">Northwind Support Console</div>
+    </header>
+
+    <section class="card">
+      <h2>Account summary</h2>
+      <p class="bio">
+        Jamie has been a Northwind customer since March 2022, managing the
+        east-coast fulfillment account for Chen &amp; Ashford Logistics. Primary
+        contact number is (415) 555-0142, billing zip 94107. Escalation
+        history: 2 prior tickets, both resolved within SLA.
+      </p>
+      <div class="stats">
+        <div class="stat"><div class="value">1,204</div><div class="label">Orders YTD</div></div>
+        <div class="stat"><div class="value">$48,930</div><div class="label">Lifetime value</div></div>
+        <div class="stat"><div class="value">42</div><div class="label">Open tickets</div></div>
+      </div>
+    </section>
+
+    <section class="card chart">
+      <h2>Activity</h2>
+      <img src="assets/chart.svg" alt="Chart of Jamie Torres's monthly active usage for the Northwind account">
+    </section>
+
+    <section class="card">
+      <h2>Recent tickets</h2>
+      <input type="search" placeholder="Search tickets for jamie.torres@northwind-retail.example">
+      <table>
+        <thead>
+          <tr><th>Subject</th><th>Requester</th><th>Opened</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Shipment #48213 delayed to warehouse</td>
+            <td title="Jamie Torres — Account Owner">Jamie Torres</td>
+            <td>2026-07-30</td>
+          </tr>
+          <tr>
+            <td>Invoice mismatch on May statement</td>
+            <td title="Priya Nandakumar — Billing Contact">Priya Nandakumar</td>
+            <td>2026-06-18</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>

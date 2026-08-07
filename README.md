@@ -33,6 +33,7 @@ await page.screenshot({ path: 'anonymized.png', fullPage: true })
 ```
 
 Full details, options, and examples live in each package's own README.
+A ready-to-sanitize demo page lives in [`examples/`](examples).
 
 ## Using this from another project
 
