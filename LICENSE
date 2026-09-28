@@ -20,8 +20,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
----
-
-The proper-noun/glossary word list in packages/dictionary was adapted from
-entozoon/atom-lorem-gibson (MIT License, Copyright (c) 2016 Michael Cook).
-See SOURCES.md for full provenance of the dictionary data.
