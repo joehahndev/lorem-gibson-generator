@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: CLI smoke test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - name: Generate text and check the output is non-empty
+        run: |
+          set -euo pipefail
+          out="$(npx lorem-gibson paragraph -n 2)"
+          test -n "$out"
+          echo "$out" | head -c 300; echo
+          npx lorem-gibson sentence --seed demo-page
+          npx lorem-gibson dictionary --format csv --out /tmp/words.csv
+          test -s /tmp/words.csv
+          wc -l /tmp/words.csv
