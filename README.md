@@ -1,5 +1,7 @@
 # lorem-gibson-generator
 
+[![CI](https://github.com/joehahndev/lorem-gibson-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/joehahndev/lorem-gibson-generator/actions/workflows/ci.yml)
+
 Cyberpunk (William Gibson-style) placeholder text, four tools, one repo
 — bound together by the word dictionary they draw from and the
 anonymize-a-screenshot purpose most of them serve.
